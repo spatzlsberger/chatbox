@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"chatbox/chatboxutil"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -118,6 +119,7 @@ func validateInput(input string) (int64, error){
 }
 
 func main(){
+	chatboxutil.HelloWorld()
 	username, err := registerUser()
 	users, err := getUsers()
 	if err != nil {
