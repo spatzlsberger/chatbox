@@ -19,7 +19,7 @@ type getUsersResponse struct {
 }
 
 type getMessagesRequest struct {
-	Username string
+	Username string `json:"username"`
 }
 
 type getMessagesResponse struct {
