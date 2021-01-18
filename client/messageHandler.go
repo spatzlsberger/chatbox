@@ -2,29 +2,22 @@ package main
 
 import (
 	"bytes"
+	"chatbox/chatboxutil"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 )
 
-type getMessagesRequest struct {
-	Username string `json:"username"`
-}
-
-type getMessagesResponse struct {
-	Messages []NewMessage `json:"Messages"`
-}
-
 // GetMessages is a function to get new messages for the user from the server
-func GetMessages(username string) ([]NewMessage, error) {
+func GetMessages(username string) ([]chatboxutil.Message, error) {
 	url := "http://localhost:5050/getMessages"
-	jsonbody, _ := json.Marshal(getMessagesRequest{username})
+	jsonbody, _ := json.Marshal(chatboxutil.GetMessagesRequest{UserName:username})
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonbody))
 	if err != nil{
 		return nil, err
 	}
-	var messagesResponse getMessagesResponse
+	var messagesResponse chatboxutil.GetMessagesResponse
 	err = json.NewDecoder(resp.Body).Decode(&messagesResponse)
 
 	if err != nil{
@@ -54,7 +47,7 @@ func sendMessage(username string) (bool, error){
 	fmt.Print("Enter your message you wish to send: ")
 	message, err := getInput()
 
-	jsonbody, err := json.Marshal(NewMessage{username, to, message})
+	jsonbody, err := json.Marshal(chatboxutil.Message{From:username, To:to, Message:message})
 	url := "http://localhost:5050/sendMessage"
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonbody))
 	if err != nil{

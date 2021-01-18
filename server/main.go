@@ -1,6 +1,7 @@
 package main
 
 import (
+	"chatbox/chatboxutil"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -8,31 +9,13 @@ import (
 	"strconv"
 )
 
-type message struct {
-	From string `json:"From"`
-	To string `json:"To"`
-	Message string `json:"Message"`
-}
-
-type getUsersResponse struct {
-	Users []string `json:"Users"`
-}
-
-type getMessagesRequest struct {
-	Username string `json:"username"`
-}
-
-type getMessagesResponse struct {
-	Messages []message `json:"Messages"`
-}
-
 //map of users the system is aware of
 var userNames map[string]int64
 // map of waiting messages for a user with that ID
-var messages map[int64][]message
+var messages map[int64][]chatboxutil.Message
 
 func sendNewMessage(w http.ResponseWriter, r *http.Request) {
-	var mess message
+	var mess chatboxutil.Message
 	err := json.NewDecoder(r.Body).Decode(&mess)
 	if err != nil {
 		panic(err)
@@ -45,20 +28,20 @@ func sendNewMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func getMessages(w http.ResponseWriter, r *http.Request) {
-	var request getMessagesRequest
+	var request chatboxutil.GetMessagesRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(messages)
-	fmt.Println(request.Username)
+	fmt.Println(request.UserName)
 	fmt.Println(userNames)
-	id := request.Username
+	id := request.UserName
 	fmt.Println(userNames[id])
 	messagesToReturn := messages[userNames[id]]
 
-	json.NewEncoder(w).Encode(getMessagesResponse{messagesToReturn})
+	json.NewEncoder(w).Encode(chatboxutil.GetMessagesResponse{Messages:messagesToReturn})
 	messages[userNames[id]] = nil
 
 }
@@ -72,7 +55,7 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 	for k := range userNames {
 		userarray = append(userarray, k)
 	}
-	resp := getUsersResponse{userarray}
+	resp := chatboxutil.GetUsersReponse{Users:userarray}
 	json.NewEncoder(w).Encode(resp)
 }
 
@@ -102,7 +85,7 @@ func addNewUser(w http.ResponseWriter, r *http.Request) {
 func main () {
 	fmt.Println("Starting server on port 5050")
 	userNames = map[string]int64{}
-	messages = map[int64][]message{}
+	messages = map[int64][]chatboxutil.Message{}
 	http.HandleFunc("/getUsers", getUsers)
 	http.HandleFunc("/sendMessage", sendNewMessage)
 	http.HandleFunc("/getMessages", getMessages)

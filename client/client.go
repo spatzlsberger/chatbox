@@ -14,22 +14,6 @@ import (
 	"strings"
 )
 
-// NewMessage is the format of messages sent from client to server
-type NewMessage struct {
-	From string `json:"From"`
-	To string `json:"To"`
-	Message string `json:"Message"`
-}
-
-type newUser struct {
-	Name string `json:"name"`
-	UserName string `json:"username"`
-}
-
-type getUsersReponse struct {
-	Users []string `json:"Users"`
-}
-
 func registerUser() (string, error){
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Enter your name: ")
@@ -38,7 +22,7 @@ func registerUser() (string, error){
 	userName, _ := reader.ReadString('\n')
 
 	url := "http://localhost:5050/addNewUser"
-	newUserBody := newUser{strings.TrimRight(name,"\r\n"), strings.TrimRight(userName, "\r\n")}
+	newUserBody := chatboxutil.NewUser{Name:strings.TrimRight(name,"\r\n"), UserName:strings.TrimRight(userName, "\r\n")}
 	jsonBody, _ := json.Marshal(newUserBody)
 	req, err := http.Post(url, "application/json", bytes.NewBuffer(jsonBody))
 
@@ -61,7 +45,7 @@ func getUsers() ([]string, error){
 	}
 	defer req.Body.Close()
 
-	var availableUsers getUsersReponse
+	var availableUsers chatboxutil.GetUsersReponse
 	err = json.NewDecoder(req.Body).Decode(&availableUsers)
 	for _, returnedUser := range availableUsers.Users {
 		fmt.Println("User: ", returnedUser)
@@ -119,7 +103,6 @@ func validateInput(input string) (int64, error){
 }
 
 func main(){
-	chatboxutil.HelloWorld()
 	username, err := registerUser()
 	users, err := getUsers()
 	if err != nil {
