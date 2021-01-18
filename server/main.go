@@ -61,7 +61,7 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 
 func addNewUser(w http.ResponseWriter, r *http.Request) {
 	
-	var u User
+	var u chatboxutil.NewUser
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&u)
 	if err != nil {
@@ -74,7 +74,7 @@ func addNewUser(w http.ResponseWriter, r *http.Request) {
 
 	id := rand.Int63n(50000)
 
-	userNames[u.Username] = id
+	userNames[u.UserName] = id
 	w.Write([]byte(strconv.FormatInt(id, 10)))
 
 	for k := range userNames {
