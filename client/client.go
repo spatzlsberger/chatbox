@@ -21,8 +21,11 @@ func registerUser() (string, error){
 	fmt.Print("Enter your username: ")
 	userName, _ := reader.ReadString('\n')
 
+	name = strings.TrimRight(name, "\r\n")
+	userName = strings.TrimRight(userName, "\r\n")
+
 	url := "http://localhost:5050/addNewUser"
-	newUserBody := chatboxutil.NewUser{Name:strings.TrimRight(name,"\r\n"), UserName:strings.TrimRight(userName, "\r\n")}
+	newUserBody := chatboxutil.NewUser{Name:name, UserName:userName}
 	jsonBody, _ := json.Marshal(newUserBody)
 	req, err := http.Post(url, "application/json", bytes.NewBuffer(jsonBody))
 
@@ -47,9 +50,6 @@ func getUsers() ([]string, error){
 
 	var availableUsers chatboxutil.GetUsersReponse
 	err = json.NewDecoder(req.Body).Decode(&availableUsers)
-	for _, returnedUser := range availableUsers.Users {
-		fmt.Println("User: ", returnedUser)
-	}
 	return availableUsers.Users, nil
 }
 
@@ -58,7 +58,6 @@ func mainloop(users []string, username string) {
 	for {
 		promptSelection()
 		selection, _ := getInput()
-		fmt.Println(selection)
 		valSelection, err := validateInput(selection)
 		if err != nil{
 			fmt.Println("Invalid selection, try again.")
@@ -69,7 +68,8 @@ func mainloop(users []string, username string) {
 		} else if valSelection == 2{
 			sendMessage(username)
 		} else if valSelection == 3{
-			GetMessages(username)
+			messages, _ := GetMessages(username)
+			displayMessages(messages)
 		}
 	}
 }

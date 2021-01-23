@@ -34,7 +34,7 @@ func showAllUsers(username string){
 		panic("error occured during getting users")
 	}
 	for index, user := range users{
-		fmt.Println("User ", index, ": ", user)
+		fmt.Println("User ", index + 1, ": ", user)
 	}
 }
 
@@ -57,4 +57,17 @@ func sendMessage(username string) (bool, error){
 		return false, errors.New("Message request sent to server, but failed to create")
 	}
 	return true, nil
+}
+
+func displayMessages(messages []chatboxutil.Message) (error){
+	if len(messages) == 0 {
+		fmt.Println("No new messages for you.")
+	} else {
+		fmt.Println("===========")
+		for _,mess := range messages{
+			fmt.Println(mess)
+		fmt.Println("===========")
+		}
+	}
+	return nil
 }

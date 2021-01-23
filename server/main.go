@@ -42,7 +42,7 @@ func getMessages(w http.ResponseWriter, r *http.Request) {
 	messagesToReturn := messages[userNames[id]]
 
 	json.NewEncoder(w).Encode(chatboxutil.GetMessagesResponse{Messages:messagesToReturn})
-	messages[userNames[id]] = nil
+	messages[userNames[id]] = []chatboxutil.Message{}
 
 }
 
@@ -51,6 +51,7 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 	Returns all the users that system has registered so far. 
 	*/
 	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 	var userarray []string
 	for k := range userNames {
 		userarray = append(userarray, k)
@@ -71,7 +72,6 @@ func addNewUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "text/plain")
 	w.Write([]byte("Created"))
-
 	id := rand.Int63n(50000)
 
 	userNames[u.UserName] = id

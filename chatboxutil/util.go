@@ -1,10 +1,16 @@
 package chatboxutil
 
+import "fmt"
+
 // Message struct used on client and server
 type Message struct {
 	From string `json:"From"`
 	To string `json:"To"`
 	Message string `json:"Message"`
+}
+
+func (mess Message) String() string{
+	return fmt.Sprintf("From: %s\nMessage:%s", mess.From, mess.Message)
 }
 
 // NewUser struct used on client and server
